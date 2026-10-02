@@ -353,8 +353,9 @@ class ProxyLinkConverter {
       // Fully encoded links stash base64(method:password@host:port) in the
       // authority, which Uri lowercases via the host; re-read it raw so the
       // base64 decode stays case-sensitive.
-      final authority =
-          RegExp(r'^[^:]+://([^/?#]+)').firstMatch(text)?.group(1);
+      final authority = RegExp(
+        r'^[^:]+://([^/?#]+)',
+      ).firstMatch(text)?.group(1);
       final decoded = authority == null ? null : _decodeBase64(authority);
       if (decoded != null && decoded.contains('@')) {
         final inner = Uri.tryParse('ss://$decoded');
