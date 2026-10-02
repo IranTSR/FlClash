@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:fl_clash/common/proxy_link_converter.dart';
 import 'package:test/test.dart';
-import 'package:yaml/yaml.dart' show loadYaml;
+import 'package:yaml/yaml.dart' show YamlList, YamlMap, loadYaml;
 
 void main() {
   group('isProxyLink', () {

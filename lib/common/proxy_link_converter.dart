@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:yaml/yaml.dart' show loadYaml;
+import 'package:yaml/yaml.dart' show YamlMap, loadYaml;
 
 import 'yaml.dart';
 
