@@ -24,8 +24,9 @@ class ProxyLinkConverter {
   };
 
   static bool isProxyLink(String input) {
-    final match = RegExp(r'^([A-Za-z][A-Za-z0-9+.-]*)://')
-        .firstMatch(input.trim());
+    final match = RegExp(
+      r'^([A-Za-z][A-Za-z0-9+.-]*)://',
+    ).firstMatch(input.trim());
     if (match == null) return false;
     return _proxySchemes.contains(match.group(1)!.toLowerCase());
   }
