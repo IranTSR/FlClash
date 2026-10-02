@@ -24,8 +24,8 @@ class ProxyLinkConverter {
   };
 
   static bool isProxyLink(String input) {
-    final match =
-        RegExp(r'^([A-Za-z][A-Za-z0-9+.-]*)://').firstMatch(input.trim());
+    final match = RegExp(r'^([A-Za-z][A-Za-z0-9+.-]*)://')
+        .firstMatch(input.trim());
     if (match == null) return false;
     return _proxySchemes.contains(match.group(1)!.toLowerCase());
   }
@@ -96,11 +96,7 @@ class ProxyLinkConverter {
     return yaml.encode({
       'proxies': proxies,
       'proxy-groups': [
-        {
-          'name': 'PROXY',
-          'type': 'select',
-          'proxies': names,
-        },
+        {'name': 'PROXY', 'type': 'select', 'proxies': names},
       ],
       'rules': ['MATCH,PROXY'],
     });
@@ -225,9 +221,7 @@ class ProxyLinkConverter {
             'method': 'GET',
             'path': [(q['path']?.isNotEmpty ?? false) ? q['path']! : '/'],
             'headers': {
-              'Host': [
-                host?.isNotEmpty ?? false ? host! : defaultHost,
-              ],
+              'Host': [host?.isNotEmpty ?? false ? host! : defaultHost],
             },
           };
         }
@@ -241,8 +235,7 @@ class ProxyLinkConverter {
   ) {
     proxy['tls'] = true;
     final sni = q['sni'];
-    proxy['servername'] =
-        (sni?.isNotEmpty ?? false) ? sni! : defaultServerName;
+    proxy['servername'] = (sni?.isNotEmpty ?? false) ? sni! : defaultServerName;
     final fp = q['fp'];
     if (fp != null && fp.isNotEmpty) proxy['client-fingerprint'] = fp;
     final alpn = q['alpn'];
@@ -317,16 +310,11 @@ class ProxyLinkConverter {
     }
     final network = _clashNetwork(map['net']?.toString() ?? 'tcp');
     proxy['network'] = network;
-    _applyStreamSettings(
-      proxy,
-      network,
-      {
-        'path': map['path']?.toString() ?? '',
-        'host': map['host']?.toString() ?? '',
-        if ((map['type']?.toString() ?? '') == 'http') 'headerType': 'http',
-      },
-      server,
-    );
+    _applyStreamSettings(proxy, network, {
+      'path': map['path']?.toString() ?? '',
+      'host': map['host']?.toString() ?? '',
+      if ((map['type']?.toString() ?? '') == 'http') 'headerType': 'http',
+    }, server);
     return proxy;
   }
 
@@ -366,8 +354,7 @@ class ProxyLinkConverter {
         final inner = Uri.tryParse('ss://$decoded');
         if (inner == null || inner.userInfo.isEmpty) return null;
         method = inner.userInfo.substring(0, inner.userInfo.indexOf(':'));
-        password =
-            inner.userInfo.substring(inner.userInfo.indexOf(':') + 1);
+        password = inner.userInfo.substring(inner.userInfo.indexOf(':') + 1);
         host = inner.host;
         port = inner.hasPort ? inner.port : 0;
       } else {
@@ -401,8 +388,8 @@ class ProxyLinkConverter {
         final key = kv[0] == 'obfs-host'
             ? 'host'
             : kv[0] == 'obfs'
-                ? 'mode'
-                : kv[0];
+            ? 'mode'
+            : kv[0];
         opts[key] = kv[1];
       }
       proxy['plugin'] = parts.first;
@@ -450,8 +437,7 @@ class ProxyLinkConverter {
       'password': parts.length > 1 ? parts.sublist(1).join(':') : '',
       'udp': true,
       'sni': (q['sni']?.isNotEmpty ?? false) ? q['sni']! : uri.host,
-      'alpn': ((q['alpn']?.isNotEmpty ?? false) ? q['alpn']! : 'h3')
-          .split(','),
+      'alpn': ((q['alpn']?.isNotEmpty ?? false) ? q['alpn']! : 'h3').split(','),
       'congestion-controller': q['congestion_control'] ?? 'bbr',
       'udp-relay-mode': q['udp_relay_mode'] ?? 'native',
       'skip-cert-verify': _isTruthy(q['allow_insecure']),
@@ -478,8 +464,7 @@ class ProxyLinkConverter {
     }
     if (_isTruthy(q['tls'])) {
       proxy['tls'] = true;
-      proxy['sni'] =
-          (q['sni']?.isNotEmpty ?? false) ? q['sni']! : uri.host;
+      proxy['sni'] = (q['sni']?.isNotEmpty ?? false) ? q['sni']! : uri.host;
     }
     return proxy;
   }

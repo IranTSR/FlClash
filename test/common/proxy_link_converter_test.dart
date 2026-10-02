@@ -166,7 +166,8 @@ void main() {
 
   group('maybeConvertProfileBytes', () {
     test('passes clash yaml through untouched', () {
-      final config = 'proxies:\n  - name: a\n    type: ss\nrules:\n  - MATCH,DIRECT\n';
+      final config =
+          'proxies:\n  - name: a\n    type: ss\nrules:\n  - MATCH,DIRECT\n';
       final bytes = Uint8List.fromList(utf8.encode(config));
       expect(ProxyLinkConverter.maybeConvertProfileBytes(bytes), bytes);
     });
@@ -184,7 +185,8 @@ void main() {
     });
 
     test('converts multi-line link lists and dedupes names', () {
-      final input = 'ss://aes-128-gcm:p1@a.com:1#Same\n'
+      final input =
+          'ss://aes-128-gcm:p1@a.com:1#Same\n'
           'ss://aes-128-gcm:p2@b.com:2#Same\n'
           'not-a-link\n';
       final out = ProxyLinkConverter.maybeConvertProfileBytes(
@@ -198,7 +200,8 @@ void main() {
     });
 
     test('decodes base64 subscriptions', () {
-      final sub = 'vless://11111111-2222-3333-4444-555555555555@a.com:443#A\n'
+      final sub =
+          'vless://11111111-2222-3333-4444-555555555555@a.com:443#A\n'
           'ss://aes-128-gcm:pw@b.com:8388#B\n';
       final encoded = base64Encode(utf8.encode(sub));
       final out = ProxyLinkConverter.maybeConvertProfileBytes(

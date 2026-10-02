@@ -184,10 +184,7 @@ extension ProfileExtension on Profile {
           ProxyLinkConverter.linkName(url),
           id.toString(),
         ]),
-      ).saveFile(
-        Uint8List.fromList(utf8.encode(url)),
-        validate: validate,
-      );
+      ).saveFile(Uint8List.fromList(utf8.encode(url)), validate: validate);
     }
     final response = await request.getFileResponseForUrl(url);
     final disposition = response.headers.value('content-disposition');
