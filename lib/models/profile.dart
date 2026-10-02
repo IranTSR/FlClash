@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
@@ -177,6 +178,17 @@ extension ProfileExtension on Profile {
   }
 
   Future<Profile> update({required ValidateConfig validate}) async {
+    if (ProxyLinkConverter.isProxyLink(url)) {
+      return copyWith(
+        label: label.takeFirstValid([
+          ProxyLinkConverter.linkName(url),
+          id.toString(),
+        ]),
+      ).saveFile(
+        Uint8List.fromList(utf8.encode(url)),
+        validate: validate,
+      );
+    }
     final response = await request.getFileResponseForUrl(url);
     final disposition = response.headers.value('content-disposition');
     final userinfo = response.headers.value('subscription-userinfo');
@@ -195,7 +207,9 @@ extension ProfileExtension on Profile {
   }) async {
     final path = await appPath.tempFilePath;
     final tempFile = File(path);
-    await tempFile.safeWriteAsBytes(bytes);
+    await tempFile.safeWriteAsBytes(
+      ProxyLinkConverter.maybeConvertProfileBytes(bytes),
+    );
     final message = await validate(path);
     if (message.isNotEmpty) {
       throw MessageException(message);

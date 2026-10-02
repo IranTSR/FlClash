@@ -44,7 +44,7 @@ class AddProfileView extends ConsumerWidget {
           if (value == null || value.isEmpty) {
             return appLocalizations.emptyTip('').trim();
           }
-          if (!value.isUrl) {
+          if (!value.isUrl && !ProxyLinkConverter.isProxyLink(value)) {
             return appLocalizations.urlTip('').trim();
           }
           return null;
