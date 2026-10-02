@@ -18,6 +18,6 @@ jobs:
       - run: flutter pub get
       - name: Show wanted diff
         run: |
-          dart --version
-          dart format --output=show lib/common/proxy_link_converter.dart > /tmp/wanted.diff 2>/dev/null || true
-          head -120 /tmp/wanted.diff
+          cp lib/common/proxy_link_converter.dart /tmp/orig.dart
+          dart format lib/common/proxy_link_converter.dart
+          diff -u /tmp/orig.dart lib/common/proxy_link_converter.dart | head -80 || true
