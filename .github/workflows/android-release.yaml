@@ -1,0 +1,105 @@
+name: android-release
+
+on:
+  push:
+    tags:
+      - 'android-v*'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FLUTTER_VERSION: '3.47.1'
+  GO_VERSION: '1.26.4'
+  NDK_VERSION: r28c
+
+jobs:
+  build-android:
+    name: Build Android APKs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: core/go.sum
+
+      - name: Setup Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: android-all
+          workspaces: services/helper
+          cache-directories: .dart_tool/hooks_runner
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: master
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Setup NDK
+        uses: nttld/setup-ndk@v1
+        id: build-ndk
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          add-to-path: true
+          link-to-sdk: true
+
+      - name: Get Flutter Dependency
+        run: |
+          flutter --version
+          flutter pub get
+
+      - name: Build Android APKs
+        env:
+          ANDROID_NDK_HOME: ${{ steps.build-ndk.outputs.ndk-path }}
+        run: dart setup.dart android -v
+
+      - name: List dist
+        run: ls -la ./dist
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifact-android
+          path: ./dist
+          overwrite: true
+
+  release:
+    name: Publish Android release
+    permissions:
+      contents: write
+    needs: [build-android]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APKs
+        uses: actions/download-artifact@v4
+        with:
+          path: ./dist/
+          pattern: artifact-*
+          merge-multiple: true
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./dist/*
+          body: |
+            FlClash Android build with in-app proxy link auto-converter.
+
+            Import v2rayNG-style links (vless / vmess / trojan / ss / hy2 / tuic),
+            link subscriptions, or a local file — they are converted to Clash.Meta
+            YAML automatically during import, no external converter needed.
+
+            Debug-signed build (package `com.follow.clash.dev`), installs alongside
+            the Play release version.
