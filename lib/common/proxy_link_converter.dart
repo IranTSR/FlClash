@@ -79,7 +79,7 @@ class ProxyLinkConverter {
         return _parseTrojan(uri, name);
       case 'ss':
       case 'shadowsocks':
-        return _parseShadowsocks(uri, name);
+        return _parseShadowsocks(uri, name, text);
       case 'hy2':
       case 'hysteria2':
         return _parseHysteria2(uri, name);
@@ -339,12 +339,32 @@ class ProxyLinkConverter {
     return proxy;
   }
 
-  static Map<String, dynamic>? _parseShadowsocks(Uri uri, String name) {
+  static Map<String, dynamic>? _parseShadowsocks(
+    Uri uri,
+    String name,
+    String text,
+  ) {
     var method = '';
     var password = '';
     var host = uri.host;
     var port = uri.hasPort ? uri.port : 0;
-    final userInfo = uri.userInfo;
+    var userInfo = uri.userInfo;
+    if (userInfo.isEmpty && host.isNotEmpty) {
+      // Fully encoded links stash base64(method:password@host:port) in the
+      // authority, which Uri lowercases via the host; re-read it raw so the
+      // base64 decode stays case-sensitive.
+      final authority =
+          RegExp(r'^[^:]+://([^/?#]+)').firstMatch(text)?.group(1);
+      final decoded = authority == null ? null : _decodeBase64(authority);
+      if (decoded != null && decoded.contains('@')) {
+        final inner = Uri.tryParse('ss://$decoded');
+        if (inner != null && inner.userInfo.isNotEmpty) {
+          userInfo = inner.userInfo;
+          host = inner.host;
+          port = inner.hasPort ? inner.port : 0;
+        }
+      }
+    }
     if (userInfo.contains(':')) {
       method = userInfo.substring(0, userInfo.indexOf(':'));
       password = userInfo.substring(userInfo.indexOf(':') + 1);
