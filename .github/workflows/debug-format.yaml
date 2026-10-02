@@ -1,0 +1,23 @@
+name: debug-format
+
+on:
+  push:
+    branches:
+      - link-converter
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: '3.47.1'
+          cache: true
+      - run: flutter pub get
+      - name: Show wanted diff
+        run: |
+          dart --version
+          dart format --output=show lib/common/proxy_link_converter.dart > /tmp/wanted.diff 2>/dev/null || true
+          head -120 /tmp/wanted.diff
